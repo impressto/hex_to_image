@@ -17,13 +17,36 @@ const HexToImageConverter: React.FC = () => {
   const [bmpData, setBmpData] = useState<Uint8Array | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
       setError('');
       setImageData(null);
       setPreviewUrl('');
+      setBmpData(null);
+      
+      // Automatically process the file
+      await processSelectedFile(file);
+    }
+  };
+
+  const processSelectedFile = async (file: File) => {
+    setIsProcessing(true);
+    setError('');
+
+    try {
+      const parsedData = await parseHexFile(file);
+      setImageData(parsedData);
+      createPreview(parsedData);
+      
+      // Generate BMP data
+      const bmp = createBMP(parsedData);
+      setBmpData(bmp);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred while processing the file');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -238,27 +261,6 @@ const HexToImageConverter: React.FC = () => {
     setPreviewUrl(canvas.toDataURL());
   };
 
-  const processFile = async () => {
-    if (!selectedFile) return;
-
-    setIsProcessing(true);
-    setError('');
-
-    try {
-      const parsedData = await parseHexFile(selectedFile);
-      setImageData(parsedData);
-      createPreview(parsedData);
-      
-      // Generate BMP data
-      const bmp = createBMP(parsedData);
-      setBmpData(bmp);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while processing the file');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
   const downloadBMP = () => {
     if (!bmpData) return;
     
@@ -398,14 +400,6 @@ const HexToImageConverter: React.FC = () => {
             </button>
           </div>
         </div>
-        
-        <button 
-          onClick={processFile}
-          disabled={!selectedFile || isProcessing}
-          className="process-btn"
-        >
-          {isProcessing ? 'Processing...' : 'Convert to Image'}
-        </button>
       </div>
 
       {error && (
