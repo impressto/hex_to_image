@@ -293,7 +293,9 @@ const HexToImageConverter: React.FC = () => {
       // Process the file content directly
       const parsedData = await parseHexFile(exampleFile);
       setImageData(parsedData);
-      createPreview(parsedData);
+      
+      // Use the hosted PNG image for preview instead of generating canvas
+      setPreviewUrl('https://impressto.ca/hex_to_image/public/galaxy-spiral.png');
       
       // Generate BMP data
       const bmp = createBMP(parsedData);
@@ -399,8 +401,8 @@ const HexToImageConverter: React.FC = () => {
                 alt="Preview" 
                 className="preview-image"
                 style={{
-                  maxWidth: '400px',
-                  maxHeight: '400px',
+                  maxWidth: '240px',
+                  maxHeight: '240px',
                   imageRendering: 'pixelated'
                 }}
               />
