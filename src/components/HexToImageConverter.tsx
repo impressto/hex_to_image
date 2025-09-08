@@ -279,7 +279,7 @@ const HexToImageConverter: React.FC = () => {
       setIsProcessing(true);
       setError('');
       
-      const response = await fetch('./galaxy-spiral.h');
+      const response = await fetch('https://impressto.ca/hex_to_image/public/galaxy-spiral.h');
       if (!response.ok) {
         throw new Error('Failed to load example file');
       }
@@ -341,7 +341,7 @@ const HexToImageConverter: React.FC = () => {
 
   const downloadExampleFile = async () => {
     try {
-      const response = await fetch('./galaxy-spiral.h');
+      const response = await fetch('https://impressto.ca/hex_to_image/public/galaxy-spiral.h');
       if (!response.ok) {
         throw new Error('Failed to fetch example file');
       }
