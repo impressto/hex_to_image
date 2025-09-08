@@ -292,12 +292,43 @@ const HexToImageConverter: React.FC = () => {
       
       // Process the file content directly
       const parsedData = await parseHexFile(exampleFile);
-      setImageData(parsedData);
       
-      // Use the hosted PNG image for preview instead of generating canvas
-      setPreviewUrl('https://impressto.ca/hex_to_image/public/galaxy-spiral.png');
+      // Check if this is the specific galaxy-spiral.h example file
+      const isGalaxySpiral = exampleFile.name === 'galaxy-spiral.h';
       
-      // Generate BMP data
+      let displayData;
+      if (isGalaxySpiral) {
+        // Override the dimensions for the galaxy-spiral.h example only
+        // Create an array of exactly 57600 elements for display
+        const displayPixels = new Array(57600).fill(0);
+        // Copy the actual data up to 57600 elements
+        for (let i = 0; i < Math.min(parsedData.data.length, 57600); i++) {
+          displayPixels[i] = parsedData.data[i];
+        }
+        
+        displayData = {
+          ...parsedData,
+          width: 240,
+          height: 240,
+          data: displayPixels
+        };
+      } else {
+        // Use the actual parsed data for other files
+        displayData = parsedData;
+      }
+      
+      setImageData(displayData);
+      
+      // Use different preview methods based on the file
+      if (isGalaxySpiral) {
+        // Use the hosted PNG image for the galaxy-spiral.h example
+        setPreviewUrl('https://impressto.ca/hex_to_image/public/galaxy-spiral.png');
+      } else {
+        // Use normal canvas preview for other files
+        createPreview(displayData);
+      }
+      
+      // Generate BMP data using the actual parsed data for proper file generation
       const bmp = createBMP(parsedData);
       setBmpData(bmp);
       
