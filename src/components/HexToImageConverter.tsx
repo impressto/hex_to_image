@@ -14,6 +14,7 @@ const HexToImageConverter: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string>('');
   const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [bmpData, setBmpData] = useState<Uint8Array | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
@@ -247,6 +248,10 @@ const HexToImageConverter: React.FC = () => {
       const parsedData = await parseHexFile(selectedFile);
       setImageData(parsedData);
       createPreview(parsedData);
+      
+      // Generate BMP data
+      const bmp = createBMP(parsedData);
+      setBmpData(bmp);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred while processing the file');
     } finally {
@@ -255,22 +260,74 @@ const HexToImageConverter: React.FC = () => {
   };
 
   const downloadBMP = () => {
-    if (!imageData) return;
-
-    const bmpData = createBMP(imageData);
-    const blob = new Blob([bmpData], { type: 'image/bmp' });
+    if (!bmpData) return;
+    
+    const blob = new Blob([new Uint8Array(bmpData)], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
     
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${imageData.name}.bmp`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'converted_image.bmp';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
-  return (
+  const loadExampleFile = async () => {
+    try {
+      setIsProcessing(true);
+      setError('');
+      
+      const response = await fetch('./galaxy-spiral.h');
+      if (!response.ok) {
+        throw new Error('Failed to load example file');
+      }
+      
+      const content = await response.text();
+      
+      // Create a mock file object
+      const exampleFile = new File([content], 'galaxy-spiral.h', { type: 'text/plain' });
+      setSelectedFile(exampleFile);
+      
+      // Process the file content directly
+      const parsedData = await parseHexFile(exampleFile);
+      setImageData(parsedData);
+      createPreview(parsedData);
+      
+      // Generate BMP data
+      const bmp = createBMP(parsedData);
+      setBmpData(bmp);
+      
+    } catch (err) {
+      setError(`Error loading example file: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const downloadExampleFile = async () => {
+    try {
+      const response = await fetch('./galaxy-spiral.h');
+      if (!response.ok) {
+        throw new Error('Failed to fetch example file');
+      }
+      
+      const content = await response.text();
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'galaxy-spiral.h';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(`Error downloading example file: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };  return (
     <div className="hex-converter">
       <div className="upload-section">
         <div className="file-input-wrapper">
@@ -288,6 +345,25 @@ const HexToImageConverter: React.FC = () => {
           {selectedFile && (
             <span className="file-name">{selectedFile.name}</span>
           )}
+        </div>
+        
+        <div className="example-section">
+          <p>Or try with an example file:</p>
+          <div className="example-buttons">
+            <button 
+              onClick={loadExampleFile}
+              disabled={isProcessing}
+              className="example-btn"
+            >
+              {isProcessing ? 'Loading...' : 'Load Example (galaxy-spiral.h)'}
+            </button>
+            <button 
+              onClick={downloadExampleFile}
+              className="example-download-btn"
+            >
+              Download Example File
+            </button>
+          </div>
         </div>
         
         <button 

@@ -73,6 +73,66 @@
   cursor: not-allowed;
 }
 
+.example-section {
+  margin: 20px 0;
+  padding: 15px;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.example-section p {
+  margin: 0 0 15px 0;
+  color: #856404;
+  font-weight: 500;
+}
+
+.example-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.example-btn {
+  padding: 10px 20px;
+  background: #ffc107;
+  color: #212529;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.example-btn:hover:not(:disabled) {
+  background: #e0a800;
+}
+
+.example-btn:disabled {
+  background: #6c757d;
+  color: white;
+  cursor: not-allowed;
+}
+
+.example-download-btn {
+  padding: 10px 20px;
+  background: #6f42c1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.example-download-btn:hover {
+  background: #5a32a3;
+}
+
 .error-message {
   background: #f8d7da;
   border: 1px solid #f5c6cb;
@@ -137,6 +197,8 @@
   cursor: pointer;
   line-height: 0;
   transition: background-color 0.3s ease;
+  display: block;
+  margin: 0 auto;
 }
 
 .download-btn:hover {
@@ -193,5 +255,16 @@
   .preview-image {
     max-width: 100%;
     height: auto;
+  }
+  
+  .example-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .example-btn,
+  .example-download-btn {
+    width: 100%;
+    max-width: 250px;
   }
 }
