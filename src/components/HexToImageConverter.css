@@ -104,7 +104,6 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  line-height: 0;
   transition: background-color 0.3s ease;
 }
 
@@ -268,6 +267,5 @@
   .example-download-btn {
     width: 100%;
     max-width: 250px;
-    line-height: 0;
   }
 }
